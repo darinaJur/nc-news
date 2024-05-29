@@ -1,6 +1,6 @@
 const { getTopics } = require("./controllers/topics.controllers")
 const { getEndpoints } = require("./controllers/api.controllers")
-const { getArticleById } = require("./controllers/articles.controllers")
+const { getArticleById, getArticles } = require("./controllers/articles.controllers")
 
 const express = require("express")
 
@@ -12,6 +12,8 @@ app.get("/api", getEndpoints)
 
 app.get("/api/articles/:article_id", getArticleById)
 
+app.get("/api/articles", getArticles)
+
 app.all('*', (req, res) => {
     res.status(404).send({msg: "The request path does not exist"})
 })
@@ -19,11 +21,15 @@ app.all('*', (req, res) => {
 app.use((err, req, res, next) => {
     if (err.msg) {
         res.status(err.status).send({msg: err.msg})
-    } else { 
-    res.status(500).send('Server Error! :(')
+    } else {
+        next(err)
     }
 })
 
+app.use((err, req, res, next) => {
+    console.log(err)
+    res.status(500).send({ msg: 'Server Error! :(' })
+})
 
 
 
