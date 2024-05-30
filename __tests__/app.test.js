@@ -131,7 +131,6 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then((res) => {
-
             res.body.comments.forEach((comment) => {
                 expect(comment).toMatchObject( {
                    comment_id: expect.any(Number),
@@ -145,6 +144,14 @@ describe("GET /api/articles/:article_id/comments", () => {
             expect(res.body.comments).toBeSortedBy('created_at', { descending: true })
         })
     })
+    test.only("status 200: responds with an empty array when requested with a valid article ID but article has no comments", () => {
+        return request(app)
+        .get("/api/articles/11/comments")
+        .expect(200)
+        .then((res) => {
+            expect(res.body.comments).toEqual([])
+        })
+    })
     test("status 400: responds with 'Invalid input', when the article ID is not of valid type and comments cannot be selected", () => {
         return request(app)
         .get("/api/articles/notAnId/comments")
@@ -153,7 +160,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             expect(res.body.msg).toBe('Invalid Input')
     })
     })
-    test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
+    test("status 404: responds with 'Article not found', when the article ID does not exist", () => {
         return request(app)
         .get("/api/articles/99999/comments")
         .expect(404)
