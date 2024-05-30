@@ -13,24 +13,14 @@ exports.selectArticleById = (article_id) => {
 }
 
 exports.selectArticles = () => {
-    return db.query(`ALTER TABLE articles
-    ADD COLUMN comment_count INT
-    DEFAULT 0;
+    return db.query(`SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
+    CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
+    FROM articles
+    JOIN comments ON articles.article_id = comments.comment_id
+    ORDER BY created_at DESC
+    ;
     `)
-    .then(() => {
-    return db.query(`UPDATE articles
-    SET comment_count = (SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id);
-    `)
-    })
-    .then(() => {
-        return db.query(`SELECT author, title, article_id, topic, created_at, votes, article_img_url, comment_count 
-        FROM articles
-        ORDER BY created_at DESC;`)
-    })
     .then(({ rows }) => {
         return rows
     })
 }
-
-// FROM articles
-// INNER JOIN comments ON comments.article_id = articles.articles_id
