@@ -1,6 +1,6 @@
 const { getTopics } = require("./controllers/topics.controllers")
 const { getEndpoints } = require("./controllers/api.controllers")
-const { getArticleById, getArticles } = require("./controllers/articles.controllers")
+const { getArticleById, getArticles, getArticleCommentsById } = require("./controllers/articles.controllers")
 
 const express = require("express")
 
@@ -14,8 +14,16 @@ app.get("/api/articles/:article_id", getArticleById)
 
 app.get("/api/articles", getArticles)
 
+app.get("/api/articles/:article_id/comments", getArticleCommentsById)
+
 app.all('*', (req, res) => {
     res.status(404).send({msg: "The request path does not exist"})
+})
+
+app.use((err, req, res, next) => {
+    if (err.code) {
+        res.status(400).send({ msg: 'Invalid Input'} )
+    } else next(err)
 })
 
 app.use((err, req, res, next) => {

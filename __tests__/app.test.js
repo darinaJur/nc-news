@@ -57,13 +57,20 @@ describe("GET /api/articles/:article_id", () => {
             })
         })
     })
-
     test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
         return request(app)
         .get("/api/articles/99999")
         .expect(404)
         .then((res) => {
             expect(res.body.msg).toBe('Article not found')
+        })
+    })
+    test.only("status 400: responds with 'Invalid input', when the article ID is not of valid type", () => {
+        return request(app)
+        .get("/api/articles/notAnId")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
         })
     })
 })
@@ -109,3 +116,5 @@ describe("GET /api/articles", () => {
         })
     })
 })
+
+// describe("GET /api/articles/:article_id/comments")
