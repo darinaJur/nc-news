@@ -144,7 +144,7 @@ describe("GET /api/articles/:article_id/comments", () => {
             expect(res.body.comments).toBeSortedBy('created_at', { descending: true })
         })
     })
-    test.only("status 200: responds with an empty array when requested with a valid article ID but article has no comments", () => {
+    test("status 200: responds with an empty array when requested with a valid article ID but article has no comments", () => {
         return request(app)
         .get("/api/articles/11/comments")
         .expect(200)
@@ -165,7 +165,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get("/api/articles/99999/comments")
         .expect(404)
         .then((res) => {
-            expect(res.body.msg).toBe('Article not found and comments are unavailable')
+            expect(res.body.msg).toBe('Article not found')
         })
     })
 })
@@ -231,6 +231,52 @@ describe("POST /api/articles/:article_id/comments", () => {
         .expect(404)
         .then((res) => {
             expect(res.body.msg).toBe('Article not found and comment cannot be posted')
+        })
+    })
+})
+
+describe("PATCH /api/articles/:article_id", () => {
+    test("status 200: updates vote count when passed a positive value", () => {
+        return request(app)
+        .patch("/api/articles/1")
+        .send({ votes: 42})
+        .expect(200)
+        .then((res) => {
+            expect(res.body.article.votes).toBe(142)
+        })
+    })
+    test("status 200: updates vote count when passed a negative value", () => {
+        return request(app)
+        .patch("/api/articles/1")
+        .send({ votes: -42})
+        .expect(200)
+        .then((res) => {
+            expect(res.body.article.votes).toBe(58)
+        })
+    })
+    test("status 400: responds with 'Invalid Input' if votes value is not a valid syntax type", () => {
+        return request(app)
+        .patch("/api/articles/1")
+        .send({ votes: 'four'})
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+        })
+    })
+    test("status 400: responds with 'Invalid input', when the article ID is not of valid type", () => {
+        return request(app)
+        .patch("/api/articles/notAnId")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+    })
+    })
+    test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
+        return request(app)
+        .patch("/api/articles/99999")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('Article not found')
         })
     })
 })
