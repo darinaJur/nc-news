@@ -65,7 +65,7 @@ describe("GET /api/articles/:article_id", () => {
             expect(res.body.msg).toBe('Article not found')
         })
     })
-    test.only("status 400: responds with 'Invalid input', when the article ID is not of valid type", () => {
+    test("status 400: responds with 'Invalid input', when the article ID is not of valid type", () => {
         return request(app)
         .get("/api/articles/notAnId")
         .expect(400)
@@ -77,21 +77,29 @@ describe("GET /api/articles/:article_id", () => {
 
 describe("GET /api/non-existing-endpoint", () => {
     test("status 404: responds with 'The request path does not exist' if the endpoint does not exist", () => {
-    return request(app)
-    .get("/api/artivles/1")
-    .expect(404)
-    .then((res) => {
+        return request(app)
+        .get("/api/artivles/1")
+        .expect(404)
+        .then((res) => {
         expect(res.body.msg).toBe('The request path does not exist')
     })
-})
+    })
     test("status 404: responds with 'The request path does not exist' if the endpoint does not exist", () => {
-    return request(app)
-    .get("/api/artibles")
-    .expect(404)
-    .then((res) => {
+        return request(app)
+        .get("/api/artibles")
+        .expect(404)
+        .then((res) => {
         expect(res.body.msg).toBe('The request path does not exist')
     })
-})
+    })
+    test("status 404: responds with 'The request path does not exist' if the endpoint does not exist", () => {
+        return request(app)
+        .get("/api/articles/1/commentzz")
+        .expect(404)
+        .then((res) => {
+        expect(res.body.msg).toBe('The request path does not exist')
+        })
+    })
 })
 
 describe("GET /api/articles", () => {
@@ -117,4 +125,40 @@ describe("GET /api/articles", () => {
     })
 })
 
-// describe("GET /api/articles/:article_id/comments")
+describe("GET /api/articles/:article_id/comments", () => {
+    test("status 200: responds with all comments for a specified article", () => {
+        return request(app)
+        .get("/api/articles/1/comments")
+        .expect(200)
+        .then((res) => {
+            console.log(res.body.comments)
+            res.body.comments.forEach((comment) => {
+                expect(comment).toMatchObject( {
+                   comment_id: expect.any(Number),
+                   votes: expect.any(Number),
+                   created_at: expect.any(String),
+                   author: expect.any(String),
+                   body: expect.any(String),
+                   article_id: expect.any(Number)
+                })
+            })
+            expect(res.body.comments).toBeSortedBy('created_at', { descending: true })
+        })
+    })
+    test("status 400: responds with 'Invalid input', when the article ID is not of valid type and comments cannot be selected", () => {
+        return request(app)
+        .get("/api/articles/notAnId/comments")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+    })
+    })
+    test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
+        return request(app)
+        .get("/api/articles/99999/comments")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('Article not found and comments are unavailable')
+        })
+    })
+})
