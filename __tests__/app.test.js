@@ -10,7 +10,7 @@ beforeEach(() => { return seed(testData)})
 afterAll(() => { return db.end() })
 
 describe("GET /api" ,() => {
-    test.only("status: 200, responds with all endpoints and their description", () => {
+    test("status: 200, responds with all endpoints and their description", () => {
     return request(app)
     .get("/api")
     .expect(200)
@@ -131,7 +131,7 @@ describe("GET /api/articles/:article_id/comments", () => {
         .get("/api/articles/1/comments")
         .expect(200)
         .then((res) => {
-            console.log(res.body.comments)
+
             res.body.comments.forEach((comment) => {
                 expect(comment).toMatchObject( {
                    comment_id: expect.any(Number),
@@ -159,6 +159,71 @@ describe("GET /api/articles/:article_id/comments", () => {
         .expect(404)
         .then((res) => {
             expect(res.body.msg).toBe('Article not found and comments are unavailable')
+        })
+    })
+})
+
+describe("POST /api/articles/:article_id/comments", () => {
+    test("status 201: responds with a new comment", () => {
+        const requestBody = {
+            username: "butter_bridge",
+            body: "Crumpets with butter are my favourite!"
+        }
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(requestBody)
+        .expect(201)
+        .then((res) => {
+            expect(res.body.comment).toMatchObject(  {
+                comment_id: expect.any(Number),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+                author: "butter_bridge",
+                body: "Crumpets with butter are my favourite!",
+                article_id: expect.any(Number)
+            })
+        })
+    })
+    test("status 400: responds with 'Cannot post empty comment', when body is empty", () => {
+        const requestBody = {
+            username: "butter_bridge",
+            body: ""
+        }
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(requestBody)
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Cannot post empty comment')
+        })
+    })
+    test("status 400: responds with 'This user does not exist', when user is not in the database", () => {
+        const requestBody = {
+            username: "potato_king",
+            body: "Hello world!"
+        }
+        return request(app)
+        .post("/api/articles/1/comments")
+        .send(requestBody)
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('This user does not exist')
+        })
+    })
+    test("status 400: responds with 'Invalid input', when the article ID is not of valid type and comment cannot be posted", () => {
+        return request(app)
+        .post("/api/articles/notAnId/comments")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+    })
+    })
+    test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
+        return request(app)
+        .post("/api/articles/99999/comments")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('Article not found and comment cannot be posted')
         })
     })
 })
