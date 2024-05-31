@@ -83,5 +83,15 @@
     "description": "deletes an object of a specified comment by comment ID",
     "queries": [],
     "exampleResponse" : {}
+  },
+  "GET /api/users": {
+    "description": "serves an array of user objects",
+    "queries": [],
+    "exampleResponse" : {
+        "username": "lurker",
+        "name": "do_nothing",
+        "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+
+    }
   }
 }

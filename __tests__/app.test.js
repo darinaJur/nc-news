@@ -100,6 +100,15 @@ describe("GET /api/non-existing-endpoint", () => {
         expect(res.body.msg).toBe('The request path does not exist')
         })
     })
+    test("status 404: responds with 'The request path does not exist' if the endpoint does not exist", () => {
+        return request(app)
+        .get("/api/userz")
+        .expect(404)
+        .then((res) => {
+        expect(res.body.msg).toBe('The request path does not exist')
+        })
+    })
+    
 })
 
 describe("GET /api/articles", () => {
@@ -301,6 +310,23 @@ describe("DELETE /api/comments/:comment_id", () => {
         .expect(404)
         .then((res) => {
             expect(res.body.msg).toBe('Not found')
+        })
+    })
+})
+
+describe("GET /api/users", () => {
+    test("status 200: responds with an array of user objects", () => {
+        return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((res) => {
+            res.body.users.forEach((user) => {
+                expect(user).toMatchObject( {
+                    username: expect.any(String),
+                    name: expect.any(String),
+                    avatar_url: expect.any(String),
+                })
+            })
         })
     })
 })
