@@ -330,7 +330,7 @@ describe("GET /api/users", () => {
 })
 
 describe("GET /api/articles?topic", () => {
-    test("status 200: responds with articles of specified topic and if topic query is omitted, responds with all articles", () => {
+    test("status 200: responds with articles of specified topic", () => {
         return request(app)
         .get("/api/articles?topic=cats")
         .expect(200)
@@ -346,14 +346,7 @@ describe("GET /api/articles?topic", () => {
                     article_img_url: expect.any(String)
                 })
             })
-        })
-    })
-    test("status 400: responds with 'Invalid Input' if the topic does not exist", () => {
-        return request(app)
-        .get("/api/articles?topic=dogs")
-        .expect(400)
-        .then((res) => {
-            expect(res.body.msg).toBe('Invalid Input')
+            expect(res.body.articles).toHaveLength(1)
         })
     })
     test("status 200: responds with all articles when topic query is omitted", () => {
@@ -373,6 +366,22 @@ describe("GET /api/articles?topic", () => {
                     comment_count: expect.any(Number)
                 })
             })
+        })
+    })
+    test("status 200: responds with an empty array when the queried topic has no associated articles", () => {
+        return request(app)
+        .get("/api/articles?topic=paper")
+        .expect(200)
+        .then((res) => {
+            expect(res.body.articles).toEqual([])
+    })
+})
+    test("status 404: responds with 'No topic matching the topic query' if the topic does not exist", () => {
+        return request(app)
+        .get("/api/articles?topic=dogs")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('No topic matching the topic query')
         })
     })
 })

@@ -1,4 +1,5 @@
-const { selectArticleById, selectArticles, selectArticleCommentsById, addComment, checkArticleExists, changeVotes } = require("../models/articles.models")
+const articles = require("../db/data/test-data/articles")
+const { selectArticleById, selectArticles, selectArticleCommentsById, addComment, checkArticleExists, changeVotes, checkTopicExists } = require("../models/articles.models")
 
 exports.getArticleById = (req, res, next) => {
     const { article_id } = req.params
@@ -12,11 +13,22 @@ exports.getArticleById = (req, res, next) => {
 exports.getArticles = (req, res, next) => {
     const { topic } = req.query
 
-    selectArticles(topic)
-    .then((articles) => {
-        res.status(200).send({ articles })
-    })
-    .catch(next)
+    if (topic) {
+        checkTopicExists(topic)
+        .then(() => {
+            return selectArticles(topic)
+        })
+        .then((articles) => {
+            res.status(200).send( { articles })
+        })
+        .catch(next)
+    } else {
+        selectArticles()
+        .then((articles) => {
+            res.status(200).send( { articles })
+        })
+        .catch(next)
+    }
 }
 
 exports.getArticleCommentsById = (req, res, next) => {
