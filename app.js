@@ -2,6 +2,7 @@ const { getTopics } = require("./controllers/topics.controllers")
 const { getEndpoints } = require("./controllers/api.controllers")
 const { getArticleById, getArticles, getArticleCommentsById, postComment, patchVotes } = require("./controllers/articles.controllers")
 const { deleteComment } = require("./controllers/comments.controllers")
+const { getUsers } = require("./controllers/users.controllers")
 
 const express = require("express")
 
@@ -24,6 +25,8 @@ app.post("/api/articles/:article_id/comments", postComment)
 app.patch("/api/articles/:article_id", patchVotes)
 
 app.delete("/api/comments/:comment_id", deleteComment)
+
+app.get("/api/users", getUsers)
 
 app.all('*', (req, res) => {
     res.status(404).send({msg: "The request path does not exist"})
