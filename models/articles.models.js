@@ -44,15 +44,19 @@ exports.selectArticleCommentsById = (article_id) => {
 }
 
 exports.addComment = (commentToPost, article_id) => {
-    return db.query(`INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3)
-        RETURNING *;`, [commentToPost.username, commentToPost.body, article_id])
-    .then(( { rows }) => {
-        if (!rows.length) {
-            return Promise.reject({status: 404, msg: 'Article not found and comment cannot be posted'})
-        } else if (rows[0].body === '') {
-            return Promise.reject({status: 400, msg: 'Cannot post empty comment'})
-        } else return rows[0]
-    })
+    if (commentToPost.body === '') {
+        return Promise.reject({status: 400, msg: 'Cannot post empty comment'})
+    } else {
+        return db.query(`INSERT INTO comments (author, body, article_id) VALUES ($1, $2, $3)
+            RETURNING *;`, [commentToPost.username, commentToPost.body, article_id])
+        .then(({rows}) => {
+            if (!rows.length) {
+                return Promise.reject({status: 404, msg: 'Article not found and comment cannot be posted'})
+            } else {
+                return rows[0]
+            }
+        })
+    }
 }
 
 exports.changeVotes = (article_id, voteValue) => {
