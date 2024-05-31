@@ -238,7 +238,18 @@ describe("PATCH /api/articles/:article_id", () => {
         .send({ votes: 42})
         .expect(200)
         .then((res) => {
-            expect(res.body.article.votes).toBe(142)
+        expect(res.body).toMatchObject( {
+            article: {
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: 1,
+                body: expect.any(String),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: 142,
+                article_img_url: expect.any(String)
+            }
+        })
         })
     })
     test("status 200: updates vote count when passed a negative value", () => {
