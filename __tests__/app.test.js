@@ -134,7 +134,7 @@ describe("GET /api/articles/:article_id/comments", () => {
                    created_at: expect.any(String),
                    author: expect.any(String),
                    body: expect.any(String),
-                   article_id: expect.any(Number)
+                   article_id: 1
                 })
             })
             expect(res.body.comments).toBeSortedBy('created_at', { descending: true })
