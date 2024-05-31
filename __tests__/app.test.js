@@ -280,3 +280,27 @@ describe("PATCH /api/articles/:article_id", () => {
         })
     })
 })
+
+describe("DELETE /api/comments/:comment_id", () => {
+    test("status 204: responds with no content", () => {
+        return request(app)
+        .delete("/api/comments/1")
+        .expect(204)
+    })
+    test("status 400: responds with 'Invalid Input'", () => {
+        return request(app)
+        .delete("/api/comments/notAnId")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+        })
+    })
+    test("status 404: responds with 'Not found'", () => {
+        return request(app)
+        .delete("/api/comments/99999")
+        .expect(404)
+        .then((res) => {
+            expect(res.body.msg).toBe('Not found')
+        })
+    })
+})
