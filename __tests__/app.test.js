@@ -38,7 +38,7 @@ describe("GET /api/topics", () => {
 })
 
 describe("GET /api/articles/:article_id", () => {
-    test("status: 200, responds with an article of a specific ID from the GET request", () => {
+    test("status 200: responds with an article of a specific ID from the GET request", () => {
         return request(app)
         .get("/api/articles/1")
         .expect(200)
@@ -57,7 +57,19 @@ describe("GET /api/articles/:article_id", () => {
             })
         })
     })
-    test("status: 404, responds with 'Article not found', when the article ID does not exist", () => {
+    test("status 200: responds with a specified article with added property of comment_count", () => {
+        return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then((res) => {
+            expect(res.body).toMatchObject( {
+                article: {
+                    comment_count: expect.any(Number)
+                }
+            })
+        })
+    })
+    test("status 404: responds with 'Article not found', when the article ID does not exist", () => {
         return request(app)
         .get("/api/articles/99999")
         .expect(404)
@@ -349,29 +361,6 @@ describe("GET /api/articles?topic", () => {
                     article_img_url: expect.any(String),
                     comment_count: expect.any(Number)
                 })
-            })
-        })
-    })
-})
-
-describe("GET /api/articles/:article_id (comment_count)", () => {
-    test("status 200: responds with a specified article with added property of comment_count", () => {
-        return request(app)
-        .get("/api/articles/1")
-        .expect(200)
-        .then((res) => {
-            expect(res.body).toMatchObject( {
-                article: {
-                    author: expect.any(String),
-                    title: expect.any(String),
-                    article_id: expect.any(Number),
-                    body: expect.any(String),
-                    topic: expect.any(String),
-                    created_at: expect.any(String),
-                    votes: expect.any(Number),
-                    article_img_url: expect.any(String),
-                    comment_count: expect.any(Number)
-                }
             })
         })
     })
