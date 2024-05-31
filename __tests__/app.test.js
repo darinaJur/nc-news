@@ -330,3 +330,52 @@ describe("GET /api/users", () => {
         })
     })
 })
+
+describe("GET /api/articles?topic", () => {
+    test("status 200: responds with articles of specified topic and if topic query is omitted, responds with all articles", () => {
+        return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then((res) => {
+            res.body.articles.forEach((article) => {
+                expect(article).toMatchObject({
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    // body: expect.any(String),
+                    topic: "cats",
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String)
+                })
+            })
+        })
+    })
+    test("status 400: responds with 'Invalid Input' if the topic does not exist", () => {
+        return request(app)
+        .get("/api/articles?topic=dogs")
+        .expect(400)
+        .then((res) => {
+            expect(res.body.msg).toBe('Invalid Input')
+        })
+    })
+    test("status 200: responds with all articles when topic query is omitted", () => {
+        return request(app)
+        .get("/api/articles?topic")
+        .expect(200)
+        .then((res) => {
+            res.body.articles.forEach((article) => {
+                expect(article).toMatchObject( {
+                    author: expect.any(String),
+                    title: expect.any(String),
+                    article_id: expect.any(Number),
+                    topic: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    article_img_url: expect.any(String),
+                    comment_count: expect.any(Number)
+                })
+            })
+        })
+    })
+})

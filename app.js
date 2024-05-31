@@ -28,6 +28,7 @@ app.delete("/api/comments/:comment_id", deleteComment)
 
 app.get("/api/users", getUsers)
 
+
 app.all('*', (req, res) => {
     res.status(404).send({msg: "The request path does not exist"})
 })
