@@ -17,28 +17,19 @@ exports.selectArticleById = (article_id) => {
   };
 
 exports.selectArticles = (topic) => {
-  const validTopic = ["cats", "mitch", "paper"]
-
-  if (topic && !validTopic.includes(topic)) {
-    return Promise.reject({ status: 400, msg: "Invalid Input" })
-  }
 
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
     CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
-    FROM articles
-    JOIN comments ON articles.article_id = comments.comment_id `
+    FROM articles `
   const queryValues = []
 
   if (topic) {
-    sqlQuery += "WHERE topic = $1"
+    sqlQuery += "WHERE topic = $1 "
     queryValues.push(topic)
   }
 
-  sqlQuery += " ORDER BY created_at DESC;"
-
-  return db.query(sqlQuery, queryValues).then(({ rows }) => {
-    return rows
-  })
+  sqlQuery += "ORDER BY created_at DESC;"
+  return db.query(sqlQuery, queryValues).then(({ rows }) => rows)
 };
 
 exports.checkTopicExists = (topic) => {
