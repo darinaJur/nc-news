@@ -307,3 +307,20 @@ describe("GET /api/articles?topic", () => {
     expect(res.body.msg).toBe("No topic matching the topic query");
   });
 });
+describe("GET /api/articles (sorting queries)", () => {
+  test("status 200: responds with all articles sorted by created_at in ascending order", async () => {
+    const res = await request(app).get("/api/articles?sort_by=created_at&order=ASC")
+    expect(res.status).toBe(200);
+    expect(res.body.articles).toBeSortedBy("created_at")
+  })
+  test("status 200: responds with all articles sorted by created_at in ascending order if URL has queries in an opposite case", async () => {
+    const res = await request(app).get("/api/articles?sort_by=CREATED_AT&order=asc")
+    expect(res.status).toBe(200);
+    expect(res.body.articles).toBeSortedBy("created_at")
+  })
+  test("status 200: responds with all articles sorted by title in ascending order (A - Z)", async () => {
+    const res = await request(app).get("/api/articles?sort_by=title&order=asc")
+    expect(res.status).toBe(200);
+    expect(res.body.articles).toBeSortedBy("title")
+  })
+});
