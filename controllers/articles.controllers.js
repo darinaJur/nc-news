@@ -1,65 +1,74 @@
-const articles = require("../db/data/test-data/articles")
-const { selectArticleById, selectArticles, selectArticleCommentsById, addComment, checkArticleExists, changeVotes, checkTopicExists } = require("../models/articles.models")
+const articles = require("../db/data/test-data/articles");
+const {
+  selectArticleById,
+  selectArticles,
+  selectArticleCommentsById,
+  addComment,
+  checkArticleExists,
+  changeVotes,
+  checkTopicExists,
+} = require("../models/articles.models");
 
-exports.getArticleById = (req, res, next) => {
-    const { article_id } = req.params
-    selectArticleById(article_id)
-    .then((article) => {
-        res.status(200).send({ article })
-    })
-    .catch(next)
-}
+exports.getArticleById = async (req, res, next) => {
+  const { article_id } = req.params;
+  try {
+    const article = await selectArticleById(article_id);
+    res.status(200).send({ article });
+  } catch (err) {
+    next(err);
+  }
+};
 
-exports.getArticles = (req, res, next) => {
-    const { topic } = req.query
+exports.getArticles = async (req, res, next) => {
+  const { topic } = req.query;
 
+  try {
     if (topic) {
-        checkTopicExists(topic)
-        .then(() => {
-            return selectArticles(topic)
-        })
-        .then((articles) => {
-            res.status(200).send( { articles })
-        })
-        .catch(next)
+      await checkTopicExists(topic);
+      const articles = await selectArticles(topic);
+      res.status(200).send({ articles });
     } else {
-        selectArticles()
-        .then((articles) => {
-            res.status(200).send( { articles })
-        })
-        .catch(next)
+      const articles = await selectArticles();
+      res.status(200).send({ articles });
     }
-}
+  } catch (err) {
+    next(err);
+  }
+};
 
-exports.getArticleCommentsById = (req, res, next) => {
-    const { article_id } = req.params
+exports.getArticleCommentsById = async (req, res, next) => {
+  const { article_id } = req.params;
 
-    const promises = [selectArticleCommentsById(article_id), (checkArticleExists(article_id))]
+  try {
+    await checkArticleExists(article_id)
+    const comments = await selectArticleCommentsById(article_id)
+    res.status(200).send({ comments });
+  } catch (err) {
+    next(err)
+  }
+};
 
-    Promise.all(promises)
-    .then((resolvedPromises) => {
-        const comments = resolvedPromises[0]
-        res.status(200).send( { comments })
-    })
-    .catch(next)
-}
+exports.postComment = async (req, res, next) => {
+  const commentToPost = req.body;
+  const { article_id } = req.params;
 
-exports.postComment = (req, res, next) => {
-    const commentToPost = req.body
-    const { article_id } = req.params
+  try {
+    const comment = await addComment(commentToPost, article_id);
+    res.status(201).send({ comment });
+  } catch (err) {
+    next(err);
+  }
 
-    addComment(commentToPost, article_id).then((comment) => {
-        res.status(201).send({ comment })
-    })
-    .catch(next)
-}
+};
 
-exports.patchVotes = (req, res, next) => {
-    const { article_id } = req.params
-    const voteValue = req.body.votes
+exports.patchVotes = async (req, res, next) => {
+  const { article_id } = req.params;
+  const voteValue = req.body.votes;
 
-    changeVotes(article_id, voteValue).then((article) => {
-        res.status(200).send({ article })
-    })
-    .catch(next)
-}
+  try {
+      const article = await changeVotes(article_id, voteValue)
+      res.status(200).send({ article });
+  } catch (err) {
+    next (err)
+  }
+};
