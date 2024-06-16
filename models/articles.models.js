@@ -14,7 +14,18 @@ exports.selectArticleById = async (article_id) => {
   }
 };
 
-exports.selectArticles = async (topic) => {
+exports.selectArticles = async (topic = undefined, sort_by = "created_at", order = "DESC") => {
+  const validSortBy = ["author", "title", "article_id", "topic", "created_at", "votes", "article_img_url", "comment_count", "AUTHOR", "TITLE", "ARTICLE_ID", "TOPIC", "CREATED_AT", "VOTES", "ARTICLE_IMG_URL", "COMMENT_COUNT"];
+  const validOrder = ["ASC", "DESC", "asc", "desc"];
+
+  if (!validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
+  if (!validOrder.includes(order)) {
+    return Promise.reject({ status: 400, msg: "Bad Request" });
+  }
+
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
     CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
     FROM articles `;
@@ -25,8 +36,9 @@ exports.selectArticles = async (topic) => {
     queryValues.push(topic);
   }
 
-  sqlQuery += "ORDER BY created_at DESC;";
-
+  
+  sqlQuery += `ORDER BY ${sort_by} ${order.toUpperCase()};`;
+  
   const { rows } = await db.query(sqlQuery, queryValues);
   return rows;
 };
