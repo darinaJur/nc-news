@@ -340,3 +340,35 @@ describe("GET /api/users/:username", () => {
     expect(res.body.msg).toBe("User not found")
   })
 })
+
+describe("PATCH /api/comments/:comment_id", () => {
+  test("status 200: updates vote count when passed a positive value", async () => {
+    const res = await request(app).patch("/api/comments/1").send({ inc_votes: 10 });
+    expect(res.status).toBe(200);
+    expect(res.body.comment).toMatchObject({
+      comment_id: 1,
+      votes: 26,
+      created_at: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      article_id: expect.any(Number),
+    });
+  });
+  test("status 200: updates vote count when passed a negative value", async () => {
+    const res = await request(app).patch("/api/comments/1").send({ inc_votes: -10 });
+    expect(res.status).toBe(200);
+    expect(res.body.comment).toMatchObject({
+      comment_id: 1,
+      votes: 6,
+      created_at: expect.any(String),
+      author: expect.any(String),
+      body: expect.any(String),
+      article_id: expect.any(Number),
+    });
+  });
+  test("status 404: updates vote count when passed a negative value", async () => {
+    const res = await request(app).patch("/api/comments/100000").send({ inc_votes: 10 });
+    expect(res.status).toBe(404);
+    expect(res.body.msg).toBe("Comment not found")
+  });
+})
