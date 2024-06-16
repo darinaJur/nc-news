@@ -324,3 +324,19 @@ describe("GET /api/articles (sorting queries)", () => {
     expect(res.body.articles).toBeSortedBy("title")
   })
 });
+describe("GET /api/users/:username", () => {
+  test("status 200: responds with an object of a user with corresponding properties", async () => {
+    const res = await request(app).get("/api/users/lurker")
+    expect(res.status).toBe(200)
+    expect(res.body.user).toMatchObject({
+      username: "lurker",
+      name: expect.any(String),
+      avatar_url: expect.any(String),
+    });
+  })
+  test("status 404: responds with 'User not found' if a searched user does not exist", async () => {
+    const res = await request(app).get("/api/users/banana_king")
+    expect(res.status).toBe(404)
+    expect(res.body.msg).toBe("User not found")
+  })
+})
