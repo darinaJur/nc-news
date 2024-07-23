@@ -109,3 +109,18 @@ exports.changeVotes = async (article_id, voteValue) => {
     return Promise.reject({ status: 404, msg: "Article not found" });
   } else return rows[0];
 };
+
+
+exports.addArticle = async (articleToPost) => {
+  if (articleToPost.body === "") {
+    return Promise.reject({ status: 400, msg: "Cannot post empty article" });
+  } else {
+    const { rows } = await db.query(
+      `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5)
+      RETURNING *,
+      CAST ((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) as comment_count;`,
+      [articleToPost.author, articleToPost.title, articleToPost.body, articleToPost.topic, articleToPost.article_img_url]
+      )
+     return rows[0]
+  }
+}

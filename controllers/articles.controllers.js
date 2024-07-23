@@ -7,6 +7,7 @@ const {
   checkArticleExists,
   changeVotes,
   checkTopicExists,
+  addArticle,
 } = require("../models/articles.models");
 
 exports.getArticleById = async (req, res, next) => {
@@ -72,3 +73,14 @@ exports.patchVotes = async (req, res, next) => {
     next (err)
   }
 };
+
+exports.postArticle = async (req, res, next) => {
+  const articleToPost = req.body;
+
+  try {
+    const article = await addArticle(articleToPost)
+    res.status(201).send({ article })
+  } catch (err) {
+    next(err)
+  }
+}
