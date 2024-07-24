@@ -21,16 +21,17 @@ exports.getArticleById = async (req, res, next) => {
 };
 
 exports.getArticles = async (req, res, next) => {
-  const { topic, sort_by, order } = req.query;
+  const { topic, sort_by, order, limit, p } = req.query;
 
   try {
     if (topic) {
       await checkTopicExists(topic);
-      const articles = await selectArticles(topic, sort_by, order);
+      const articles = await selectArticles(topic, sort_by, order, limit, p);
       res.status(200).send({ articles });
     } else {
-      const articles = await selectArticles(topic, sort_by, order);
-      res.status(200).send({ articles });
+      const articles = await selectArticles(topic, sort_by, order, limit, p);
+      const total_count = articles.length
+      res.status(200).send({ articles, total_count });
     }
   } catch (err) {
     next(err);

@@ -309,41 +309,47 @@ describe("GET /api/articles?topic", () => {
 });
 describe("GET /api/articles (sorting queries)", () => {
   test("status 200: responds with all articles sorted by created_at in ascending order", async () => {
-    const res = await request(app).get("/api/articles?sort_by=created_at&order=ASC")
+    const res = await request(app).get(
+      "/api/articles?sort_by=created_at&order=ASC"
+    );
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("created_at")
-  })
+    expect(res.body.articles).toBeSortedBy("created_at");
+  });
   test("status 200: responds with all articles sorted by created_at in ascending order if URL has queries in an opposite case", async () => {
-    const res = await request(app).get("/api/articles?sort_by=CREATED_AT&order=asc")
+    const res = await request(app).get(
+      "/api/articles?sort_by=CREATED_AT&order=asc"
+    );
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("created_at")
-  })
+    expect(res.body.articles).toBeSortedBy("created_at");
+  });
   test("status 200: responds with all articles sorted by title in ascending order (A - Z)", async () => {
-    const res = await request(app).get("/api/articles?sort_by=title&order=asc")
+    const res = await request(app).get("/api/articles?sort_by=title&order=asc");
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("title")
-  })
+    expect(res.body.articles).toBeSortedBy("title");
+  });
 });
 describe("GET /api/users/:username", () => {
   test("status 200: responds with an object of a user with corresponding properties", async () => {
-    const res = await request(app).get("/api/users/lurker")
-    expect(res.status).toBe(200)
+    const res = await request(app).get("/api/users/lurker");
+    expect(res.status).toBe(200);
     expect(res.body.user).toMatchObject({
       username: "lurker",
       name: expect.any(String),
       avatar_url: expect.any(String),
     });
-  })
+  });
   test("status 404: responds with 'User not found' if a searched user does not exist", async () => {
-    const res = await request(app).get("/api/users/banana_king")
-    expect(res.status).toBe(404)
-    expect(res.body.msg).toBe("User not found")
-  })
-})
+    const res = await request(app).get("/api/users/banana_king");
+    expect(res.status).toBe(404);
+    expect(res.body.msg).toBe("User not found");
+  });
+});
 
 describe("PATCH /api/comments/:comment_id", () => {
   test("status 200: updates vote count when passed a positive value", async () => {
-    const res = await request(app).patch("/api/comments/1").send({ inc_votes: 10 });
+    const res = await request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: 10 });
     expect(res.status).toBe(200);
     expect(res.body.comment).toMatchObject({
       comment_id: 1,
@@ -355,7 +361,9 @@ describe("PATCH /api/comments/:comment_id", () => {
     });
   });
   test("status 200: updates vote count when passed a negative value", async () => {
-    const res = await request(app).patch("/api/comments/1").send({ inc_votes: -10 });
+    const res = await request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -10 });
     expect(res.status).toBe(200);
     expect(res.body.comment).toMatchObject({
       comment_id: 1,
@@ -367,13 +375,13 @@ describe("PATCH /api/comments/:comment_id", () => {
     });
   });
   test("status 404: updates vote count when passed a negative value", async () => {
-    const res = await request(app).patch("/api/comments/100000").send({ inc_votes: 10 });
+    const res = await request(app)
+      .patch("/api/comments/100000")
+      .send({ inc_votes: 10 });
     expect(res.status).toBe(404);
-    expect(res.body.msg).toBe("Comment not found")
+    expect(res.body.msg).toBe("Comment not found");
   });
-})
-
-
+});
 
 describe("POST /api/articles", () => {
   test("status 201: responds with a new article", async () => {
@@ -382,12 +390,11 @@ describe("POST /api/articles", () => {
       title: "TitleTest",
       body: "BodyTest",
       topic: "mitch",
-      article_img_url: "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+      article_img_url:
+        "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     };
 
-    const res = await request(app)
-      .post("/api/articles")
-      .send(requestBody);
+    const res = await request(app).post("/api/articles").send(requestBody);
     expect(res.status).toBe(201);
     expect(res.body.article).toMatchObject({
       article_id: expect.any(Number),
@@ -398,7 +405,8 @@ describe("POST /api/articles", () => {
       title: "TitleTest",
       body: "BodyTest",
       topic: "mitch",
-      article_img_url: "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+      article_img_url:
+        "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     });
   });
 
@@ -408,14 +416,86 @@ describe("POST /api/articles", () => {
       title: "TitleTest",
       body: "",
       topic: "mitch",
-      article_img_url: "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+      article_img_url:
+        "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
     };
 
-    const res = await request(app)
-      .post("/api/articles")
-      .send(requestBody);
+    const res = await request(app).post("/api/articles").send(requestBody);
     expect(res.status).toBe(400);
     expect(res.body.msg).toBe("Cannot post empty article");
   });
+});
 
+describe("GET /api/articles (pagination)", () => {
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?limit=10&p=1");
+    expect(res.status).toBe(200);
+    res.body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.total_count).toBe(10);
+  });
+
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?limit=10&p=2");
+    expect(res.status).toBe(200);
+    res.body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.total_count).toBe(3);
+  });
+
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?limit=20&p=1");
+    expect(res.status).toBe(200);
+    res.body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.total_count).toBe(13);
+  });
+
+  test("status 200: responds with a correct count of articles per page when no values are set in limit or page", async () => {
+    const res = await request(app).get("/api/articles?limit&p");
+    expect(res.status).toBe(200);
+    res.body.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.total_count).toBe(10);
+  });
 });
