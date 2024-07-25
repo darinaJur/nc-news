@@ -161,6 +161,23 @@ exports.addArticle = async (articleToPost) => {
   if (articleToPost.body === "") {
     return Promise.reject({ status: 400, msg: "Cannot post empty article" });
   } else {
+    const checkTopicExists = async () => {
+      const { rows } = await db.query(`SELECT * FROM topics WHERE slug = $1;`, [
+        articleToPost.topic,
+      ]);
+
+      if (!rows.length) {
+        await db.query(
+          `INSERT INTO topics
+        (slug, description)
+        VALUES ($1, DEFAULT)`,
+          [articleToPost.topic]
+        );
+      }
+    };
+
+    await checkTopicExists()
+
     const { rows } = await db.query(
       `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5)
       RETURNING *,

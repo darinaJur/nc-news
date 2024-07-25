@@ -410,6 +410,32 @@ describe("POST /api/articles", () => {
     });
   });
 
+  test("status 201: responds with a new article and a new topic added to the database", async () => {
+    const requestBody = {
+      author: "butter_bridge",
+      title: "TitleTest",
+      body: "BodyTest",
+      topic: "dogs",
+      article_img_url:
+        "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    };
+
+    const res = await request(app).post("/api/articles").send(requestBody);
+    expect(res.status).toBe(201);
+    expect(res.body.article).toMatchObject({
+      article_id: expect.any(Number),
+      votes: expect.any(Number),
+      created_at: expect.any(String),
+      comment_count: expect.any(Number),
+      author: "butter_bridge",
+      title: "TitleTest",
+      body: "BodyTest",
+      topic: "dogs",
+      article_img_url:
+        "https://images.pexels.com/photos/57416/cat-sweet-kitty-animals-57416.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+    });
+  });
+
   test("status 400: responds with 'Cannot post empty article', when body is empty", async () => {
     const requestBody = {
       author: "butter_bridge",
