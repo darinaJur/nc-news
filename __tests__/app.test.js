@@ -525,3 +525,20 @@ describe("GET /api/articles (pagination)", () => {
     expect(res.body.total_count).toBe(10);
   });
 });
+
+describe("DELETE /api/articles/:article_id", () => {
+  test("status 204: responds with no content", async () => {
+    const res = await request(app).delete("/api/articles/1");
+    expect(res.status).toBe(204);
+  });
+  test("status 400: responds with 'Invalid Input'", async () => {
+    const res = await request(app).delete("/api/articles/notAnId");
+    expect(res.status).toBe(400);
+    expect(res.body.msg).toBe("Invalid Input");
+  });
+  test("status 404: responds with 'Not found'", async () => {
+    const res = await request(app).delete("/api/articles/99999");
+    expect(res.status).toBe(404);
+    expect(res.body.msg).toBe("Article not found");
+  });
+});

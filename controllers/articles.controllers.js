@@ -8,6 +8,7 @@ const {
   changeVotes,
   checkTopicExists,
   addArticle,
+  deleteArticleById,
 } = require("../models/articles.models");
 
 exports.getArticleById = async (req, res, next) => {
@@ -30,7 +31,7 @@ exports.getArticles = async (req, res, next) => {
       res.status(200).send({ articles });
     } else {
       const articles = await selectArticles(topic, sort_by, order, limit, p);
-      const total_count = articles.length
+      const total_count = articles.length;
       res.status(200).send({ articles, total_count });
     }
   } catch (err) {
@@ -42,11 +43,11 @@ exports.getArticleCommentsById = async (req, res, next) => {
   const { article_id } = req.params;
 
   try {
-    await checkArticleExists(article_id)
-    const comments = await selectArticleCommentsById(article_id)
+    await checkArticleExists(article_id);
+    const comments = await selectArticleCommentsById(article_id);
     res.status(200).send({ comments });
   } catch (err) {
-    next(err)
+    next(err);
   }
 };
 
@@ -60,7 +61,6 @@ exports.postComment = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
-
 };
 
 exports.patchVotes = async (req, res, next) => {
@@ -68,10 +68,10 @@ exports.patchVotes = async (req, res, next) => {
   const voteValue = req.body.votes;
 
   try {
-      const article = await changeVotes(article_id, voteValue)
-      res.status(200).send({ article });
+    const article = await changeVotes(article_id, voteValue);
+    res.status(200).send({ article });
   } catch (err) {
-    next (err)
+    next(err);
   }
 };
 
@@ -79,9 +79,21 @@ exports.postArticle = async (req, res, next) => {
   const articleToPost = req.body;
 
   try {
-    const article = await addArticle(articleToPost)
-    res.status(201).send({ article })
+    const article = await addArticle(articleToPost);
+    res.status(201).send({ article });
   } catch (err) {
-    next(err)
+    next(err);
   }
-}
+};
+
+exports.deleteArticle = async (req, res, next) => {
+  const { article_id } = req.params;
+
+  try {
+    await checkArticleExists(article_id);
+    await deleteArticleById(article_id);
+    res.status(204).send({});
+  } catch (err) {
+    next(err);
+  }
+};

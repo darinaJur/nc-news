@@ -176,7 +176,7 @@ exports.addArticle = async (articleToPost) => {
       }
     };
 
-    await checkTopicExists()
+    await checkTopicExists();
 
     const { rows } = await db.query(
       `INSERT INTO articles (author, title, body, topic, article_img_url) VALUES ($1, $2, $3, $4, $5)
@@ -192,4 +192,18 @@ exports.addArticle = async (articleToPost) => {
     );
     return rows[0];
   }
+};
+
+exports.deleteArticleById = async (article_id) => {
+  await db.query(
+    `DELETE FROM comments
+    WHERE comments.article_id = $1;`,
+    [article_id]
+  );
+  await db.query(
+    `
+  DELETE FROM articles
+  WHERE articles.article_id = $1;`,
+    [article_id]
+  );
 };
