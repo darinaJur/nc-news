@@ -52,14 +52,19 @@ exports.selectArticles = async (
   limit = parseInt(limit) || 10;
   p = parseInt(p) || 1;
 
+  let countQuery = "SELECT COUNT (*) FROM articles "
+
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
     CAST((SELECT COUNT(*) FROM comments WHERE comments.article_id = articles.article_id) AS INTEGER) AS comment_count
     FROM articles `;
   const queryValues = [];
+  const countQueryValues = []
 
   if (topic) {
+    countQuery += "WHERE topic = $1 "
     sqlQuery += "WHERE topic = $1 ";
     queryValues.push(topic);
+    countQueryValues.push(topic)
   }
 
   sqlQuery += `ORDER BY ${sort_by} ${order.toUpperCase()} `;
@@ -67,27 +72,31 @@ exports.selectArticles = async (
   const offsetValue = (p - 1) * limit;
 
   if (topic) {
-    if (p === 1) {
-      sqlQuery += `LIMIT $2`;
-      queryValues.push(limit);
+      if (p === 1) {
+        sqlQuery += `LIMIT $2`;
+        queryValues.push(limit);
+      } else {
+        sqlQuery += `LIMIT $2 OFFSET $3`;
+        queryValues.push(limit, offsetValue);
+      }
     } else {
-      sqlQuery += `LIMIT $2 OFFSET $3`;
-      queryValues.push(limit, offsetValue);
-    }
-  } else {
-    if (p === 1) {
-      sqlQuery += `LIMIT $1`;
-      queryValues.push(limit);
-    } else {
-      sqlQuery += `LIMIT $1 OFFSET $2`;
-      queryValues.push(limit, offsetValue);
-    }
+      if (p === 1) {
+        sqlQuery += `LIMIT $1`;
+        queryValues.push(limit);
+      } else {
+        sqlQuery += `LIMIT $1 OFFSET $2`;
+        queryValues.push(limit, offsetValue);
+      }
   }
 
   sqlQuery += ";";
+  // console.log(sqlQuery, '<<<sqlQuery')
+  // console.log(queryValues, '<<<<queryValues')
 
-  const { rows } = await db.query(sqlQuery, queryValues);
-  return rows;
+  const totalArticleCount = await db.query (countQuery, countQueryValues)
+
+  const { rows: articles } = await db.query(sqlQuery, queryValues);
+  return { articles, total_count: parseInt(totalArticleCount.rows[0].count) };
 };
 
 exports.checkTopicExists = async (topic) => {

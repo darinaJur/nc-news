@@ -84,7 +84,7 @@ describe("GET /api/articles", () => {
   test("status 200: responds with all articles with properties of author, title, article_id, topc, created_at, votes, article_img_url and comment_count", async () => {
     const res = await request(app).get("/api/articles");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -96,7 +96,7 @@ describe("GET /api/articles", () => {
         comment_count: expect.any(Number),
       });
     });
-    expect(res.body.articles).toBeSortedBy("created_at", { descending: true });
+    expect(res.body.articles.articles).toBeSortedBy("created_at", { descending: true });
   });
 });
 
@@ -267,7 +267,7 @@ describe("GET /api/articles?topic", () => {
   test("status 200: responds with articles of specified topic", async () => {
     const res = await request(app).get("/api/articles?topic=cats");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -278,12 +278,12 @@ describe("GET /api/articles?topic", () => {
         article_img_url: expect.any(String),
       });
     });
-    expect(res.body.articles).toHaveLength(1);
+    expect(res.body.articles.articles).toHaveLength(1);
   });
   test("status 200: responds with all articles when topic query is omitted", async () => {
     const res = await request(app).get("/api/articles?topic");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -299,7 +299,7 @@ describe("GET /api/articles?topic", () => {
   test("status 200: responds with an empty array when the queried topic has no associated articles", async () => {
     const res = await request(app).get("/api/articles?topic=paper");
     expect(res.status).toBe(200);
-    expect(res.body.articles).toEqual([]);
+    expect(res.body.articles.articles).toEqual([]);
   });
   test("status 404: responds with 'No topic matching the topic query' if the topic does not exist", async () => {
     const res = await request(app).get("/api/articles?topic=dogs");
@@ -313,19 +313,19 @@ describe("GET /api/articles (sorting queries)", () => {
       "/api/articles?sort_by=created_at&order=ASC"
     );
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("created_at");
+    expect(res.body.articles.articles).toBeSortedBy("created_at");
   });
   test("status 200: responds with all articles sorted by created_at in ascending order if URL has queries in an opposite case", async () => {
     const res = await request(app).get(
       "/api/articles?sort_by=CREATED_AT&order=asc"
     );
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("created_at");
+    expect(res.body.articles.articles).toBeSortedBy("created_at");
   });
   test("status 200: responds with all articles sorted by title in ascending order (A - Z)", async () => {
     const res = await request(app).get("/api/articles?sort_by=title&order=asc");
     expect(res.status).toBe(200);
-    expect(res.body.articles).toBeSortedBy("title");
+    expect(res.body.articles.articles).toBeSortedBy("title");
   });
 });
 describe("GET /api/users/:username", () => {
@@ -456,7 +456,7 @@ describe("GET /api/articles (pagination)", () => {
   test("status 200: responds with a correct count of articles per page", async () => {
     const res = await request(app).get("/api/articles?limit=10&p=1");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -468,13 +468,14 @@ describe("GET /api/articles (pagination)", () => {
         comment_count: expect.any(Number),
       });
     });
-    expect(res.body.total_count).toBe(10);
+    expect(res.body.articles.articles.length).toBe(10);
+    expect(res.body.articles.total_count).toBe(13);
   });
 
   test("status 200: responds with a correct count of articles per page", async () => {
     const res = await request(app).get("/api/articles?limit=10&p=2");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -486,13 +487,70 @@ describe("GET /api/articles (pagination)", () => {
         comment_count: expect.any(Number),
       });
     });
-    expect(res.body.total_count).toBe(3);
+    expect(res.body.articles.articles.length).toBe(3);
+    expect(res.body.articles.total_count).toBe(13);
+  });
+
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?topic=cats&limit=9&p=1");
+    expect(res.status).toBe(200);
+    res.body.articles.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.articles.total_count).toBe(1);
+  });
+
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?limit=10&p=2");
+    expect(res.status).toBe(200);
+    res.body.articles.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.articles.articles.length).toBe(3);
+    expect(res.body.articles.total_count).toBe(13);
+  });
+
+  test("status 200: responds with a correct count of articles per page", async () => {
+    const res = await request(app).get("/api/articles?limit=9&p=2");
+    expect(res.status).toBe(200);
+    res.body.articles.articles.forEach((article) => {
+      expect(article).toMatchObject({
+        author: expect.any(String),
+        title: expect.any(String),
+        article_id: expect.any(Number),
+        topic: expect.any(String),
+        created_at: expect.any(String),
+        votes: expect.any(Number),
+        article_img_url: expect.any(String),
+        comment_count: expect.any(Number),
+      });
+    });
+    expect(res.body.articles.articles.length).toBe(4);
+    expect(res.body.articles.total_count).toBe(13);
   });
 
   test("status 200: responds with a correct count of articles per page", async () => {
     const res = await request(app).get("/api/articles?limit=20&p=1");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -504,13 +562,13 @@ describe("GET /api/articles (pagination)", () => {
         comment_count: expect.any(Number),
       });
     });
-    expect(res.body.total_count).toBe(13);
+    expect(res.body.articles.total_count).toBe(13);
   });
 
   test("status 200: responds with a correct count of articles per page when no values are set in limit or page", async () => {
-    const res = await request(app).get("/api/articles?limit&p");
+    const res = await request(app).get("/api/articles");
     expect(res.status).toBe(200);
-    res.body.articles.forEach((article) => {
+    res.body.articles.articles.forEach((article) => {
       expect(article).toMatchObject({
         author: expect.any(String),
         title: expect.any(String),
@@ -522,7 +580,8 @@ describe("GET /api/articles (pagination)", () => {
         comment_count: expect.any(Number),
       });
     });
-    expect(res.body.total_count).toBe(10);
+    expect(res.body.articles.articles).toHaveLength(10);
+    expect(res.body.articles.total_count).toBe(13);
   });
 });
 
